@@ -20,7 +20,7 @@
   </div>
 
   <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" id="marco" onclick="saludar();">
-    <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_real"/>
+    <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_real" id="antena_loop_1"/>
     <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_objetivo"/>
   </svg> 
 
@@ -36,13 +36,35 @@ function ratonPulsado() {
 }
 
 let botonPulsado = false;
+let coordenadaX_inic
+let coordenadaY_inic
+let anguloInic
 let marco = document.getElementById("marco")
+
+
+
+//let marco = document.getElementById("antena_real")
 marco.addEventListener("mousedown", (e) => {
   if (e.button === 0) {
+    rect = marco.getBoundingClientRect();
+    console.log("RECT", rect)
     botonPulsado = true;
+    coordenadaX_inic =  e.clientX-rect.x
+    coordenadaY_inic =  e.clientY-rect.y 
+    anguloInic = Math.atan2(-coordenadaY_inic+centroY, coordenadaX_inic-centroX)
+    console.log(`coordenadaX_inic: ${coordenadaX_inic}, coordenadaY_inic: ${coordenadaY_inic}`)
+
+    console.log(`angulo inicial: ${rad2Grad(anguloInic)}`)
+
     marco.addEventListener("mousemove", capturarCoordenadas)
   }
 })
+   
+marco.addEventListener("mouseleave", ()=> {
+  botonPulsado = false;
+  marco.removeEventListener('mousemove', capturarCoordenadas)
+})
+
 
 marco.addEventListener("mouseup", ()=> {
   botonPulsado = false;
@@ -51,10 +73,19 @@ marco.addEventListener("mouseup", ()=> {
 
 function capturarCoordenadas(e){
   if (botonPulsado) {
-    console.log(`coordenadas: (${e.clientX}, ${e.clientY})` )
+    let anguloFin = Math.atan2(e.clientY-centroY, e.clientX-centroX)
+    
+    console.log(`coordInic: (${coordenadaX_inic}, ${coordenadaY_inic})->(${coordenadaX_inic-centroX}, ${coordenadaY_inic-centroY}), anguloInic: ${rad2Grad(anguloInic)}`);
+    console.log(`coordFin:  (${e.clientX}, ${e.clientY})->(${e.clientX-centroX}, ${e.clientY-centroY}), anguloFin: ${rad2Grad(anguloFin)}`);
+    
+    console.log(`Inc. ángulo: ${rad2Grad(anguloFin-anguloInic)}`)
+    
   }
 }
 
+function rad2Grad(rad) {
+  return rad*180/Math.PI;
+}
 
   function dibujarAntena(antenaID, color, ancho) {
 
@@ -85,6 +116,8 @@ function capturarCoordenadas(e){
 
 
   let anchura = 400;
+  let centroX = anchura/2;
+  let centroY = anchura/2;
   dibujarAntena("antena_real", "blue", 400)
   dibujarAntena("antena_objetivo", "red", 400)
 
