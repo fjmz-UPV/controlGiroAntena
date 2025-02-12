@@ -20,7 +20,7 @@
   </div>
 
   <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" id="marco" onclick="saludar();">
-    <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_real" id="antena_loop_1"/>
+    <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_real" />
     <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_objetivo"/>
   </svg> 
 
@@ -71,15 +71,30 @@ marco.addEventListener("mouseup", ()=> {
   marco.removeEventListener('mousemove', capturarCoordenadas)
 })
 
+
+giro2 = {grados:45, inc:0.5}
+
 function capturarCoordenadas(e){
   if (botonPulsado) {
-    let anguloFin = Math.atan2(e.clientY-centroY, e.clientX-centroX)
+
+    let coordenadaX =  e.clientX-rect.x
+    let coordenadaY =  e.clientY-rect.y 
+
+    
+
+    let anguloFin = Math.atan2(-coordenadaY + centroY, coordenadaX - centroX)
     
     console.log(`coordInic: (${coordenadaX_inic}, ${coordenadaY_inic})->(${coordenadaX_inic-centroX}, ${coordenadaY_inic-centroY}), anguloInic: ${rad2Grad(anguloInic)}`);
-    console.log(`coordFin:  (${e.clientX}, ${e.clientY})->(${e.clientX-centroX}, ${e.clientY-centroY}), anguloFin: ${rad2Grad(anguloFin)}`);
+    console.log(`coordFin:  (${coordenadaX}, ${coordenadaY})->(${coordenadaX-centroX}, ${coordenadaY-centroY}), anguloFin: ${rad2Grad(anguloFin)}`);
     
-    console.log(`Inc. ángulo: ${rad2Grad(anguloFin-anguloInic)}`)
+    let incAngulo = anguloFin-anguloInic
+    giro2.grados = -rad2Grad(incAngulo)
+
+    console.log(`Inc. ángulo: ${rad2Grad(incAngulo)}`)
     
+
+    girarAntena_bis("antena_real", giro2, anchura/2, anchura/2)
+
   }
 }
 
@@ -108,10 +123,16 @@ function rad2Grad(rad) {
     antena.setAttribute("fill", color);
   }
 
-  function girarAntena(antenaID, giro, xRot, yRot) {
+  function girarAntena(antenaID, giroGrados, xRot, yRot) {
     let antena = document.getElementById(antenaID)
-    antena.setAttribute("transform", "rotate("+giro.grados+" " + xRot + " " + yRot + ")")
-    giro.grados+=giro.inc;
+    antena.setAttribute("transform", "rotate("+giroGrados.grados+" " + xRot + " " + yRot + ")")
+    giroGrados.grados+=giroGrados.inc;
+  }
+
+  function girarAntena_bis(antenaID, giroGrados, xRot, yRot) {
+    let antena = document.getElementById(antenaID)
+    antena.setAttribute("transform", "rotate("+giroGrados.grados+" " + xRot + " " + yRot + ")")
+    //giroGrados.grados+=giroGrados.inc;
   }
 
 
@@ -121,10 +142,10 @@ function rad2Grad(rad) {
   dibujarAntena("antena_real", "blue", 400)
   dibujarAntena("antena_objetivo", "red", 400)
 
-  giro = {grados:45, inc:0.5}
-  //girarAntena("antena_objetivo", giro, anchura/2, anchura/2)
+  giroGrados = {grados:45, inc:0.5}
+  //girarAntena("antena_objetivo", giroGrados, anchura/2, anchura/2)
 
-  setInterval(girarAntena, 200, "antena_objetivo", giro, anchura/2, anchura/2)
+  setInterval(girarAntena, 200, "antena_objetivo", giroGrados, anchura/2, anchura/2)
   console.log(giro)
 
 
