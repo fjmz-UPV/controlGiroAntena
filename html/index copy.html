@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+
+  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat cum, illum itaque quo deleniti cupiditate alias consectetur! Nam, animi ratione. Optio quos possimus eveniet ab blanditiis beatae deserunt ullam sunt!</p>
+
+  <div style="display: flex; justify-content: center;">
+  <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="10" x="100" y="10"  fill="blue" transform="rotate(0)"  />
+    <rect width="100" height="10" x="100" y="10"  fill="green" transform="rotate(90 150 15)" id="barra" />
+    <rect width="100" height="10" x="100" y="10"  fill="blue" transform="rotate(90 100 15)" />
+
+  </svg> 
+  </div>
+
+  <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" id="marco" onclick="saludar();">
+    <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_real" />
+    <rect width="1" height="1" x="1" y="1"  fill="blue" id="antena_objetivo"/>
+  </svg> 
+
+
+  <script>
+
+function saludar() {
+  console.log("Hola")
+}
+
+function ratonPulsado() {
+  console.log("Ratón pulsado")
+}
+
+let botonPulsado = false;
+let coordenadaX_inic
+let coordenadaY_inic
+let anguloInic
+let marco = document.getElementById("marco")
+
+
+
+//let marco = document.getElementById("antena_real")
+marco.addEventListener("mousedown", (e) => {
+  if (e.button === 0) {
+    rect = marco.getBoundingClientRect();
+    console.log("RECT", rect)
+    botonPulsado = true;
+    coordenadaX_inic =  e.clientX-rect.x
+    coordenadaY_inic =  e.clientY-rect.y 
+    anguloInic = Math.atan2(-coordenadaY_inic+centroY, coordenadaX_inic-centroX)
+    console.log(`coordenadaX_inic: ${coordenadaX_inic}, coordenadaY_inic: ${coordenadaY_inic}`)
+
+    console.log(`angulo inicial: ${rad2Grad(anguloInic)}`)
+
+    marco.addEventListener("mousemove", capturarCoordenadas)
+  }
+})
+   
+marco.addEventListener("mouseleave", ()=> {
+  botonPulsado = false;
+  marco.removeEventListener('mousemove', capturarCoordenadas)
+})
+
+
+marco.addEventListener("mouseup", ()=> {
+  botonPulsado = false;
+  marco.removeEventListener('mousemove', capturarCoordenadas)
+})
+
+
+giro2 = {grados:45, inc:0.5}
+
+function capturarCoordenadas(e){
+  if (botonPulsado) {
+
+    let coordenadaX =  e.clientX-rect.x
+    let coordenadaY =  e.clientY-rect.y 
+
+    
+
+    let anguloFin = Math.atan2(-coordenadaY + centroY, coordenadaX - centroX)
+    
+    console.log(`coordInic: (${coordenadaX_inic}, ${coordenadaY_inic})->(${coordenadaX_inic-centroX}, ${coordenadaY_inic-centroY}), anguloInic: ${rad2Grad(anguloInic)}`);
+    console.log(`coordFin:  (${coordenadaX}, ${coordenadaY})->(${coordenadaX-centroX}, ${coordenadaY-centroY}), anguloFin: ${rad2Grad(anguloFin)}`);
+    
+    let incAngulo = anguloFin-anguloInic
+    giro2.grados = -rad2Grad(incAngulo)
+
+    console.log(`Inc. ángulo: ${rad2Grad(incAngulo)}`)
+    
+
+    girarAntena_bis("antena_real", giro2, anchura/2, anchura/2)
+
+  }
+}
+
+function rad2Grad(rad) {
+  return rad*180/Math.PI;
+}
+
+  function dibujarAntena(antenaID, color, ancho) {
+
+    let alto  = ancho
+
+    let grosor = .1*ancho
+    let largo  = .8*ancho
+
+    let marco = document.getElementById("marco")
+    marco.setAttribute("width", ancho)
+    marco.setAttribute("height", alto)
+
+    let antena = document.getElementById(antenaID)
+    antena.setAttribute("width", largo)
+    antena.setAttribute("height", grosor)
+    let x = ancho/2.-largo/2.
+    let y = alto/2.-grosor/2.
+    antena.setAttribute("x", x)
+    antena.setAttribute("y", y)
+    antena.setAttribute("fill", color);
+  }
+
+  function girarAntena(antenaID, giroGrados, xRot, yRot) {
+    let antena = document.getElementById(antenaID)
+    antena.setAttribute("transform", "rotate("+giroGrados.grados+" " + xRot + " " + yRot + ")")
+    giroGrados.grados+=giroGrados.inc;
+  }
+
+  function girarAntena_bis(antenaID, giroGrados, xRot, yRot) {
+    let antena = document.getElementById(antenaID)
+    antena.setAttribute("transform", "rotate("+giroGrados.grados+" " + xRot + " " + yRot + ")")
+    //giroGrados.grados+=giroGrados.inc;
+  }
+
+
+  let anchura = 400;
+  let centroX = anchura/2;
+  let centroY = anchura/2;
+  dibujarAntena("antena_real", "blue", 400)
+  dibujarAntena("antena_objetivo", "red", 400)
+
+  giroGrados = {grados:45, inc:0.5}
+  //girarAntena("antena_objetivo", giroGrados, anchura/2, anchura/2)
+
+  setInterval(girarAntena, 200, "antena_objetivo", giroGrados, anchura/2, anchura/2)
+  console.log(giro)
+
+
+
+  
+
+  
+
+</script>
+
+  <script>
+    let angulo="60"
+    let barra = document.getElementById("barra").setAttribute("transform","rotate("+angulo+",100,15)");
+
+    function giro() {
+      let barra = document.getElementById("barra").setAttribute("transform","rotate("+angulo+",100,15)");
+      angulo=5+Number(angulo);
+    }
+
+    setInterval(giro, 200)
+
+
+
+  </script>
+
+</body>
+</html>
