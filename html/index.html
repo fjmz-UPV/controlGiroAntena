@@ -60,7 +60,6 @@ elemento_base.addEventListener("mouseleave", ()=> {
 elemento_base.addEventListener("mouseup", ()=> {
   botonPulsado = false;
   elemento_base.removeEventListener('mousemove', girar)
-  anguloInic = anguloInicSiguiente;
 })
 
 
@@ -77,9 +76,12 @@ function girar(e){
     
     anguloInstantaneo += -incAngulo;
 
+    console.log("anguloInic: " + rad2Grad(anguloInic))
+    console.log("anguloFin: " + rad2Grad(anguloFin))
+
     console.log(`Ángulo instantáneo: ${rad2Grad(anguloInstantaneo)}`)
 
-    console.log(`Inc. ángulo: ${rad2Grad(incAngulo)}`)
+    console.log(`Inc. ángulo: ${-rad2Grad(incAngulo)}`)
     
     
     girarAntena("antena_referencia", -rad2Grad(incAngulo), lado/2, lado/2)
