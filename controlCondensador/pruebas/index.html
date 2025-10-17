@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Botones Material Design</title>
+
+  <!-- Importar MaterializeCSS -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Importar íconos de Google -->
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet"
+  />
+
+
+
+  <style>
+    body {
+      padding: 2rem;
+      font-family: "Roboto", sans-serif;
+      background-color: #fafafa;
+    }
+    h4 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <h4>Control condensador</h4>  
+
+  <!-- Botones básicos -->
+  <div class="button-row">
+    <a class="waves-effect waves-light btn blue">Primario</a>
+    <a class="waves-effect waves-light btn grey darken-1">Secundario</a>
+    <a class="waves-effect waves-light btn green">Éxito</a>
+  </div>
+
+  <!-- Botones con iconos -->
+  <div class="button-row">
+    <a class="waves-effect waves-light btn red">
+      <i class="material-icons left">delete</i>Eliminar
+    </a>
+    <a class="waves-effect waves-light btn orange">
+      <i class="material-icons left">save</i>Guardar
+    </a>
+    <a class="waves-effect waves-light btn teal">
+      Enviar<i class="material-icons right">send</i>
+    </a>
+  </div>
+
+  <!-- Botones flotantes -->
+  <div class="button-row">
+    <a class="btn-floating btn-large red">
+      <i class="material-icons">arrow_upward</i>
+    </a>
+    <a class="btn-floating btn-large blue">
+      <i class="material-icons">arrow_downward</i>
+    </a>
+    <a class="btn-floating btn-large green">
+      <i class="material-icons">keyboard_arrow_up</i>
+    </a>
+        <a class="btn-floating btn-large green">
+      <i class="material-icons">keyboard_arrow_down</i>
+    </a>
+
+    <a class="btn-floating btn-large green">
+      <i class="material-icons">stop_circle</i>
+    </a>        <a class="btn-floating btn-large green">
+      <i class="material-icons">keyboard_arrow_down</i>
+    </a>
+
+  </div>
+
+  <!-- Botones planos -->
+  <div class="button-row">
+    <a class="waves-effect waves-teal btn-flat">Cancelar</a>
+    <a class="waves-effect waves-teal btn-flat">Omitir</a>
+  </div>
+
+  <!-- Script de Materialize -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

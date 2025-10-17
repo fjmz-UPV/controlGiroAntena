@@ -1,0 +1,74 @@
+.control {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.controles{
+  display:flex; 
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+
+.botones{
+  display:flex; 
+  flex-direction: column;  
+  gap: 10px;
+}
+
+
+.memorias {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
+  grid-template-rows: auto;
+  gap: 10px; /* espacio entre celdas */
+}
+
+.memoria {
+  background-color: lightblue;
+  padding: 10px;
+  text-align: center;
+}
+
+
+/*********************************/
+
+.slider-wrapper {
+  position: relative;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+input[type=range].vertical {
+  writing-mode: bt-lr; /* Firefox */
+  -webkit-appearance: slider-vertical; /* Chrome/Safari */
+  width: 8px;
+  height: 250px;
+  padding: 0;
+}
+
+/* Estilo de la burbuja flotante */
+.bubble {
+  position: absolute;
+  left: 40px;
+  background: #2196f3;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  transform: translateY(0);
+  transition: transform 0.1s ease-out;
+}
+
+/* Opcional: mejora del pulgar del slider */
+input[type=range]::-webkit-slider-thumb {
+  background-color: #2196f3;
+}
+input[type=range]::-moz-range-thumb {
+  background-color: #2196f3;
+}    

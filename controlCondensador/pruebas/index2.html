@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deslizador Vertical con Burbuja</title>
+
+  <!-- Materialize CSS -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet"
+  />
+
+  <style>
+    body {
+      background-color: #fafafa;
+      font-family: "Roboto", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h4 {
+      margin-bottom: 2rem;
+    }
+
+    .slider-wrapper {
+      position: relative;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    input[type=range].vertical {
+      writing-mode: bt-lr; /* Firefox */
+      -webkit-appearance: slider-vertical; /* Chrome/Safari */
+      width: 8px;
+      height: 250px;
+      padding: 0;
+    }
+
+    /* Estilo de la burbuja flotante */
+    .bubble {
+      position: absolute;
+      left: 40px;
+      background: #2196f3;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      transform: translateY(0);
+      transition: transform 0.1s ease-out;
+    }
+
+    /* Opcional: mejora del pulgar del slider */
+    input[type=range]::-webkit-slider-thumb {
+      background-color: #2196f3;
+    }
+    input[type=range]::-moz-range-thumb {
+      background-color: #2196f3;
+    }
+  </style>
+</head>
+
+<body>
+  <h4>Deslizador Vertical con Burbuja</h4>
+
+  <div class="slider-wrapper">
+    <input
+      type="range"
+      id="sliderVertical"
+      class="vertical"
+      min="0"
+      max="100"
+      value="50"
+    />
+    <div id="bubble" class="bubble">50</div>
+  </div>
+
+  <div class="center-align" style="margin-top: 2rem;">
+    <a class="waves-effect waves-light btn blue">
+      <i class="material-icons left">check</i>Confirmar
+    </a>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    const slider = document.getElementById("sliderVertical");
+    const bubble = document.getElementById("bubble");
+
+    function updateBubble() {
+      const min = slider.min ? slider.min : 0;
+      const max = slider.max ? slider.max : 100;
+      const val = slider.value;
+
+      // Posición relativa de la burbuja (de 0 a 1)
+      const percent = (val - min) / (max - min);
+
+      // Altura del slider
+      const sliderHeight = slider.offsetHeight;
+      const bubbleHeight = bubble.offsetHeight;
+
+      // Calcular desplazamiento (invirtiendo porque el slider vertical aumenta hacia arriba)
+      const y = sliderHeight - percent * sliderHeight - bubbleHeight/10 - sliderHeight*0.5
+
+      bubble.style.transform = `translateY(${y}px)`;
+      bubble.textContent = val;
+    }
+
+    slider.addEventListener("input", updateBubble);
+    window.addEventListener("load", updateBubble);
+  </script>
+</body>
+</html>

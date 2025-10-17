@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deslizador Vertical con Burbuja Precisa</title>
+
+  <!-- Materialize (solo para apariencia general, no imprescindible) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+
+  <style>
+    body{
+      font-family: "Roboto", sans-serif;
+      background:#fafafa;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      margin:0;
+      padding:2rem;
+      box-sizing:border-box;
+    }
+
+    .wrap{
+      display:flex;
+      gap:2rem;
+      align-items:center;
+    }
+
+    /* contenedor del slider (actúa como referencia para la burbuja) */
+    .slider-wrapper{
+      position:relative;
+      height:320px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 24px; /* espacio alrededor para que la burbuja no choque */
+      box-sizing:border-box;
+      background: white;
+      border-radius:8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    /* slider vertical */
+    input[type=range].vertical{
+      -webkit-appearance: slider-vertical; /* Chrome/Safari */
+      writing-mode: bt-lr; /* Firefox */
+      width: 10px;           /* grosor visual del rail */
+      height: 240px;         /* longitud del rail */
+      padding: 0;
+      margin: 0;
+      background: transparent;
+    }
+
+    /* thumb colors (opcional) */
+    input[type=range]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:#2196f3;
+      margin-top:0;
+      box-shadow:0 2px 6px rgba(0,0,0,.25);
+      cursor:pointer;
+    }
+    input[type=range]::-moz-range-thumb{
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:#2196f3;
+      box-shadow:0 2px 6px rgba(0,0,0,.25);
+      cursor:pointer;
+    }
+
+    /* burbuja (gota) */
+    .bubble{
+      position:absolute;
+      left: 64px; /* separación horizontal respecto al rail */
+      transform: translateY(0); /* se actualizará por JS */
+      background:#2196f3;
+      color:white;
+      padding:6px 10px;
+      border-radius:14px;
+      font-weight:500;
+      font-size:0.95rem;
+      box-shadow:0 6px 18px rgba(0,0,0,0.18);
+      pointer-events:none; /* no obstaculiza interacción */
+      z-index:50;
+      transition: transform 60ms linear;
+      white-space:nowrap;
+    }
+
+    /* ajuste responsivo: si el espacio es pequeño, poner la burbuja a la izquierda */
+    @media (max-width:420px){
+      .bubble{ left: -64px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="slider-wrapper" id="wrapper">
+      <input type="range" id="sliderVertical" class="vertical" min="0" max="100" value="50" step="1" />
+      <div id="bubble" class="bubble">50</div>
+    </div>
+
+    <!-- Ejemplo: múltiples controles que actualizan el mismo valor -->
+    <div>
+      <p style="margin:0 0 6px 0;font-weight:600">Valor actual</p>
+      <div id="valorText" style="font-size:1.25rem">50</div>
+    </div>
+  </div>
+
+  <script>
+    const slider = document.getElementById('sliderVertical');
+    const bubble = document.getElementById('bubble');
+    const wrapper = document.getElementById('wrapper');
+    const valorText = document.getElementById('valorText');
+
+    function updateBubblePosition() {
+      // lecturas seguras
+      const min = Number(slider.min) || 0;
+      const max = Number(slider.max) || 100;
+      const val = Number(slider.value);
+
+      // rects absolutos en pantalla
+      const sliderRect = slider.getBoundingClientRect();
+      const wrapperRect = wrapper.getBoundingClientRect();
+
+      // percent dentro del track (0..1)
+      const percent = (val - min) / (max - min);
+
+      // En navegadores el rail visible puede no ocupar todo sliderRect.height,
+      // pero como definimos una altura fija al input (height:240px), usamos esa altura.
+      // Calculamos la posición Y del "thumb" en coordenadas de la página:
+      // El extremo inferior del track corresponde a sliderRect.bottom,
+      // el superior a sliderRect.top. Por eso invertimos con (1 - percent).
+      const thumbYPage = sliderRect.top + (1 - percent) * sliderRect.height;
+
+      // Queremos la posición relativa dentro del wrapper (top-left del wrapper)
+      const thumbYWithinWrapper = thumbYPage - wrapperRect.top;
+
+      // Centrar la burbuja respecto al thumb (se resta la mitad de la altura de la burbuja)
+      const bubbleHalf = bubble.offsetHeight / 2;
+      const translateY = thumbYWithinWrapper - bubbleHalf;
+
+      // Aplicar transform (solo translateY)
+      bubble.style.transform = `translateY(${translateY}px)`;
+
+      // Actualizar texto
+      bubble.textContent = val;
+      valorText.textContent = val;
+    }
+
+    // Actualizar al mover (input), al cambiar por teclado (change/input), al cargar y al redimensionar
+    slider.addEventListener('input', updateBubblePosition);
+    slider.addEventListener('change', updateBubblePosition);
+    window.addEventListener('load', updateBubblePosition);
+    window.addEventListener('resize', () => {
+      // pequeño debounce por si el resize es continuo
+      clearTimeout(window._rb);
+      window._rb = setTimeout(updateBubblePosition, 50);
+    });
+
+    // Además: actualizar al hacer scroll (si el wrapper se desplaza en la página)
+    window.addEventListener('scroll', () => {
+      clearTimeout(window._sb);
+      window._sb = setTimeout(updateBubblePosition, 20);
+    });
+
+    // Inicializar inmediatamente
+    updateBubblePosition();
+  </script>
+</body>
+</html>
