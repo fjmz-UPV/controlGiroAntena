@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+<button id="boton">Botón</button>
+<br>
+<p>Respuesta: <span id="log"></span></p>
+
+<script>
+  const boton = document.getElementById('boton');
+  boton.addEventListener('click', () => {
+    alert('¡Botón presionado!');
+    sendMessage('Botón presionado');
+  });
+
+
+    const gateway = `ws://${window.location.hostname}:81/`;
+    let websocket;
+
+    function initWebSocket() {
+      websocket = new WebSocket(gateway);
+
+      websocket.onopen = () => log("✅ Conectado al WebSocket");
+      websocket.onclose = () => log("❌ Desconectado del WebSocket");
+      websocket.onmessage = (event) => log("📩 " + event.data);
+    }
+
+    function sendMessage(msg) {
+      websocket.send(msg);
+      log("📤 Enviado: " + msg);
+    }
+
+    function log(msg) {
+      const logDiv = document.getElementById("log");
+      logDiv.innerHTML += msg + "<br>";
+    }
+
+    window.addEventListener('load', initWebSocket);
+
+  </script>
+
+
+
+</script>
+
+</body>
+</html>
