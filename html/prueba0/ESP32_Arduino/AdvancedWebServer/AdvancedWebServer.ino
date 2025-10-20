@@ -31,7 +31,6 @@
 #include <WiFi.h>
 #include <NetworkClient.h>
 #include <WebServer.h>
-#include <WebSocketsServer.h>
 #include <ESPmDNS.h>
 #include <LittleFS.h>
 
@@ -39,42 +38,6 @@ const char *ssid = "Olimpiadas_Teleco_2.4";
 const char *password = "olimpiadas";
 
 WebServer server(80);
-WebSocketsServer webSocket = WebSocketsServer(81);
-
-
-// 📡 Manejador de eventos del WebSocket
-void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
-  switch (type) {
-    case WStype_CONNECTED: {
-      IPAddress ip = webSocket.remoteIP(num);
-      Serial.printf("[%u] Conectado desde %s\n", num, ip.toString().c_str());
-      webSocket.sendTXT(num, "Conexión establecida con ESP32");
-      break;
-    }
-    case WStype_DISCONNECTED:
-      Serial.printf("[%u] Desconectado\n", num);
-      break;
-
-    case WStype_TEXT: {
-      String msg = String((char*)payload);
-      Serial.printf("[%u] Mensaje recibido: %s\n", num, msg.c_str());
-
-      // Responder según el mensaje
-      if (msg == "LED_ON") {
-        //digitalWrite(2, HIGH);
-        webSocket.sendTXT(num, "LED encendido");
-      } else if (msg == "LED_OFF") {
-        //digitalWrite(2, LOW);
-        webSocket.sendTXT(num, "LED apagado");
-      } else {
-        webSocket.sendTXT(num, "Comando no reconocido");
-      }
-      break;
-    }
-  }
-}
-
-
 
 const int led = 13;
 
@@ -202,18 +165,14 @@ server.on("/", HTTP_GET, []() {
 
 
   server.begin();
-
- webSocket.begin();
-  webSocket.onEvent(onWebSocketEvent);
-
   Serial.println("Servidor web iniciado");
+
 
 
 }
 
 void loop(void) {
   server.handleClient();
-    webSocket.loop();
   delay(2);  //allow the cpu to switch to other tasks
 }
 
