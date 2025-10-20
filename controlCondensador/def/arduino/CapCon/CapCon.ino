@@ -75,7 +75,7 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
 }
 
 
-
+/*
 const int led = 13;
 
 void handleRoot() {
@@ -109,9 +109,10 @@ void handleRoot() {
   server.send(200, "text/html", temp);
   digitalWrite(led, 0);
 }
+*/
 
 void handleNotFound() {
-  digitalWrite(led, 1);
+  //digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -126,12 +127,12 @@ void handleNotFound() {
   }
 
   server.send(404, "text/plain", message);
-  digitalWrite(led, 0);
+  //digitalWrite(led, 0);
 }
 
 void setup(void) {
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
+//  pinMode(led, OUTPUT);
+//  digitalWrite(led, 0);
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -159,7 +160,7 @@ if (!LittleFS.begin()) {
 
 
 
-  if (MDNS.begin("esp32")) {
+  if (MDNS.begin("con2")) {
     Serial.println("MDNS responder started");
   }
 
@@ -217,6 +218,7 @@ void loop(void) {
   delay(2);  //allow the cpu to switch to other tasks
 }
 
+/*
 void drawGraph() {
   String out = "";
   char temp[100];
@@ -234,3 +236,4 @@ void drawGraph() {
 
   server.send(200, "image/svg+xml", out);
 }
+*/
