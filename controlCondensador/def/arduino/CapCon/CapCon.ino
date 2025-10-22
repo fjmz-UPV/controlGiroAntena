@@ -9,8 +9,8 @@
 #include <ESPmDNS.h>
 #include <LittleFS.h>
 
-const char *ssid = "Olimpiadas_Teleco_2.4";
-const char *password = "olimpiadas";
+const char *ssid = "PWLB24";
+const char *password = "upqmmpmll1605";
 
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
