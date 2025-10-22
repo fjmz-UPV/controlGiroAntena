@@ -32,12 +32,17 @@ function sendMessage(msg) {
 }
 
 function log(msg) {
-  //const logDiv = document.getElementById("log");
-  //logDiv.innerHTML += msg + "<br>";
+  const logDiv = document.getElementById("log");
+  logDiv.innerHTML += msg + "<br>";
 }
 
 function App() {
   const [count, setCount] = useState(0);
+
+  let orden ={c: 1, p: 2, v: 3 };
+  let ordenStr = JSON.stringify(orden);
+
+
 
   window.addEventListener("load", initWebSocket);
 
@@ -64,14 +69,14 @@ function App() {
           <div className="botones">
             <a
               className="btn-floating btn-large red"
-              onClick={() => sendMessage("UP")}
+              onClick={() => sendMessage(ordenStr)}
             >
               <i className="material-icons">arrow_upward</i>
             </a>
 
             <a
               className="btn-floating btn-large blue"
-              onClick={() => sendMessage("DOWN")}
+              onClick={() => sendMessage(ordenStr)}
             >
               <i className="material-icons">arrow_downward</i>
             </a>

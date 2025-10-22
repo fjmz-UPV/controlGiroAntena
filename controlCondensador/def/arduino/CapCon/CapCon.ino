@@ -8,13 +8,39 @@
 #include <WebSocketsServer.h>
 #include <ESPmDNS.h>
 #include <LittleFS.h>
+#include <ArduinoJson.h>
 
-const char *ssid = "PWLB24";
-const char *password = "upqmmpmll1605";
+
+#define OK 0
+//const char *ssid = "PWLB24";
+//const char *password = "upqmmpmll1605";
+
+const char *ssid = "Olimpiadas_Teleco_2.4";
+const char *password = "olimpiadas";
+
 
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
+
+/*
+
+Estructura de comandos:
+
+{c: c, p: p, v: v}
+
+c:0->
+c: PASOS -> avanzar [p] pasos (puede ser negativo)
+
+c: POSICION -> posicion absoluta [p]
+
+c: PRINCIPIO -> Ir a principio 
+c: FIN       -> Ir a fin
+
+v: velocidad (pasos/s)
+
+
+*/
 
 // 📡 Manejador de eventos del WebSocket
 void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
@@ -33,6 +59,22 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
       String msg = String((char*)payload);
       Serial.printf("[%u] Mensaje recibido: %s\n", num, msg.c_str());
 
+
+      JsonDocument orden;
+      deserializeJson(orden, msg);
+
+      int comando   = orden["c"];
+      int parametro = orden["p"];
+      int velocidad = orden["v"];
+
+      JsonDocument respuesta;
+      respuesta["c"]=OK;
+
+      String respuestaStr;
+      serializeJson(respuesta, respuestaStr);
+      webSocket.sendTXT(num, respuestaStr);
+
+/*
       // Responder según el mensaje
       if (msg == "LED_ON") {
         //digitalWrite(2, HIGH);
@@ -43,6 +85,8 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
       } else {
         webSocket.sendTXT(num, "Comando no reconocido");
       }
+*/
+
       break;
     }
   }
@@ -83,7 +127,7 @@ void setup(void) {
   }
 
   Serial.println("");
-  Serial.print("Conectado a ");
+  Serial.print("Conectado a red ");
   Serial.println(ssid);
   Serial.print("Dirección IP: ");
   Serial.println(WiFi.localIP());
