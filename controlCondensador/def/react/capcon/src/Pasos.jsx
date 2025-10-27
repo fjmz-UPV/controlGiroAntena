@@ -1,96 +1,107 @@
-import * as React from 'react';
-import{ useRef, useState } from 'react';
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Box from '@mui/material/Box';
+import * as React from "react";
+import { useRef, useState } from "react";
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Box from "@mui/material/Box";
+import { arriba, stop, abajo, pasoArriba, pasoAbajo } from "./comandos";
 
-let t_inic_arriba = 0;
-let t_inic_stop = 0;
-let t_inic_abajo = 0;
+export default function Pasos({ sendMessage, sendComando, xPasos }) {
+  let t_inic_arriba = 0;
+  let t_inic_abajo = 0;
 
-const umbral = 600; // milisegundos para considerar "pulsación larga"
+  let temporizador;
 
-  const handleMouseDown = () => {
+  const UMBRAL = 500; // milisegundos para considerar "pulsación larga"
+
+  const handleMouseDown = (accion) => {
+    temporizador = setTimeout(accion, UMBRAL * 1.1);
     return Date.now();
   };
 
-  const handleMouseUp = (t_inic, accion_corto, accion_largo) => {
+  const handleMouseUp = (t_inic, accion_corto) => {
     const duracion = Date.now() - t_inic;
-    if (duracion >= umbral) {
-      accion_largo();
+    if (duracion >= UMBRAL) {
+      sendMessage(stop());
+      sendComando({ movimiento: "paro" });
     } else {
+      clearInterval(temporizador);
       accion_corto();
     }
   };
 
-const accion_corto_arriba = () => {
-  console.log("Acción corto arriba");
-  // Aquí va el código para la acción de pulsación corta hacia arriba
-}
+  const accion_largo_arriba = () => {
+    sendMessage(arriba());
+    sendComando({ movimiento: "giro", valor: 1 });
+  };
 
-const accion_largo_arriba = () => {
-  console.log("Acción largo arriba");
-  // Aquí va el código para la acción de pulsación larga hacia arriba
-}
+  const accion_largo_abajo = () => {
+    sendMessage(abajo());
+    sendComando({ movimiento: "giro", valor: -1 });
+  };
 
-const buttons = [
-  <Button key="arriba" 
-    onMouseDown = { ()=> {t_inic_arriba = handleMouseDown();}} 
-    onMouseUp   = { ()=> {handleMouseUp(t_inic_arriba, accion_corto_arriba, accion_largo_arriba)}}
-    onTouchStart={()=> {t_inic_arriba = handleMouseDown();}}
-    onTouchEnd={() => {handleMouseUp(t_inic_arriba, accion_corto_arriba, accion_largo_arriba)}}>
-      &#x2191;
-  </Button>,
-  <Button key="paro" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>&#x23F9;</Button>,
-  <Button key="abajo" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>&#x2193;</Button>,
-];
+  const accion_corto_arriba = () => {
+    sendMessage(pasoArriba());
+    sendComando({ movimiento: "paso", valor: xPasos });
+  };
 
-
-
-
-
-
-export default function Pasos() {
-
-
-  const tiempoInicio = useRef(null);
-  const umbral = 600; // milisegundos para considerar "pulsación larga"
-  const [mensaje, setMensaje] = useState("Pulsa el botón");
-
-
-
-
-
+  const accion_corto_abajo = () => {
+    sendMessage(pasoAbajo());
+    sendComando({ movimiento: "paso", valor: -xPasos });
+  };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        '& > *': {
-          m: 1,
-        },
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        margin: "10px",
       }}
     >
-      <ButtonGroup orientation="vertical" aria-label="Vertical button group">
-        {buttons}
-      </ButtonGroup>
-      {/*
-      <ButtonGroup
-        orientation="vertical"
-        aria-label="Vertical button group"
-        variant="contained"
-      >
-        {buttons}
-      </ButtonGroup>
-      <ButtonGroup
-        orientation="vertical"
-        aria-label="Vertical button group"
-        variant="text"
-      >
-        {buttons}
-      </ButtonGroup>
+      <input
+        type="button"
+        id="boton_arriba"
+        value="&#x2191;"
+        onMouseDown={() => {
+          t_inic_arriba = handleMouseDown(accion_largo_arriba);
+        }}
+        onMouseUp={() => {
+          handleMouseUp(t_inic_arriba, accion_corto_arriba);
+        }}
+        onTouchStart={() => {
+          t_inic_arriba = handleMouseDown(accion_largo_arriba);
+        }}
+        onTouchEnd={() => {
+          handleMouseUp(t_inic_arriba, accion_corto_arriba);
+        }}
+      />
 
-      */}
-    </Box>
+      <input
+        type="button"
+        value="&#x23F9;"
+        onClick={() => {
+          sendMessage(stop());
+          sendComando({ movimiento: "paro" });
+        }}
+      />
+
+      <input
+        type="button"
+        id="boton_abajo"
+        value="&#x2193;"
+        onMouseDown={() => {
+          t_inic_abajo = handleMouseDown(accion_largo_abajo);
+        }}
+        onMouseUp={() => {
+          handleMouseUp(t_inic_abajo, accion_corto_abajo);
+        }}
+        onTouchStart={() => {
+          t_inic_bajo = handleMouseDown(accion_largo_abajo);
+        }}
+        onTouchEnd={() => {
+          handleMouseUp(t_inic_abajo, accion_corto_abajo);
+        }}
+      />
+    </div>
   );
 }

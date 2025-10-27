@@ -1,14 +1,15 @@
-import * as React from 'react';
+import * as React from "react";
 
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
-export default function ControlPasos() {
-  const [view, setView] = React.useState('list');
+export default function ControlPasos({ xPasos, setXPasos }) {
+  const [view, setView] = React.useState(xPasos + "");
 
-  const handleChange = (e,nv) => {
+  const handleChange = (e, nv) => {
     setView(nv);
-   console.log(e)
+    console.log(e.target.value);
+    setXPasos(e.target.value);
   };
 
   return (
@@ -18,16 +19,16 @@ export default function ControlPasos() {
       exclusive
       onChange={handleChange}
     >
-      <ToggleButton value="1x" aria-label="list">
+      <ToggleButton value="1" aria-label="list">
         1X
       </ToggleButton>
-      <ToggleButton value="5x" aria-label="module">
+      <ToggleButton value="5" aria-label="module">
         5X
       </ToggleButton>
-      <ToggleButton value="10x" aria-label="quilt">
+      <ToggleButton value="10" aria-label="quilt">
         10x
       </ToggleButton>
-      <ToggleButton value="50x" aria-label="quilt">
+      <ToggleButton value="50" aria-label="quilt">
         50x
       </ToggleButton>
     </ToggleButtonGroup>
