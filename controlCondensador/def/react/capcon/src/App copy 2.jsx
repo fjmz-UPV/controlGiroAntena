@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import "./estilos.css";
 
-import Display from "./Display.jsx";
-import Control from "./Control.jsx";
-import Memorias from "./Memorias.jsx";  
-
 import favicon from "./assets/favicon.svg";
 
 function setFavicon(url) {
@@ -40,13 +36,6 @@ function log(msg) {
   logDiv.innerHTML += msg + "<br>";
 }
 
-
-
-
-
-
-
-
 function App() {
   const [count, setCount] = useState(0);
 
@@ -55,34 +44,12 @@ function App() {
 
 
 
-  const [valor, setValor] = useState(50);
+  window.addEventListener("load", initWebSocket);
 
   useEffect(() => {
     setFavicon(favicon);
-    window.addEventListener("load", initWebSocket);
   }, []);
 
-
-
-
-
-  return(
-    <div className="pantalla" style={{display: 'flex', flexDirection: 'column', alignContent: 'center', justifyContent: 'space-between'}}>
-
-
-      <Display sendMessage={sendMessage} valor={valor} />
-
-      <Control valor={valor} setValor={setValor} />
-
-      <Memorias />
-
-      <div id="log" className="log"></div>
-
-    </div>
-  );
-
-
-  /*
   return (
     <>
       <div className="control">
@@ -96,7 +63,7 @@ function App() {
               max="100"
               value="50"
             />
-             <div id="bubble" className="bubble">50</div>
+            {/* <div id="bubble" className="bubble">50</div> */}
           </div>
 
           <div className="botones">
@@ -124,7 +91,7 @@ function App() {
               max="100"
               value="50"
             />
-           <div id="bubble" className="bubble">50</div> 
+            {/* <div id="bubble" className="bubble">50</div> */}
           </div>
         </div>
 
@@ -161,7 +128,6 @@ function App() {
       </div>
     </>
   );
-  */
 }
 
 export default App;
