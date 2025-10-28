@@ -9,7 +9,7 @@
 #include <ESPmDNS.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
-
+#include <Ticker.h>
 
 #define OK 0
 //const char *ssid = "PWLB24";
@@ -22,28 +22,50 @@ const char *password = "olimpiadas";
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
+#define RANGO_GRADOS 180
+#define GRADOS_INICIALES 92
+float gradosObjetivo; 
+float gradosActuales; 
+
+#define PASOS_POR_VUELTA 200
+#define MICROPASOS 1
+int pasosObjetivo;
+int pasosActuales;
+
+int grados2Pasos(float grados) {
+    return int( (PASOS_POR_VUELTA*MICROPASOS*grados)/360. );
+}
+
+float pasos2Grados(int pasos) {
+   return (360.*pasos) / (PASOS_POR_VUELTA*MICROPASOS);
+}
+
+Ticker temporizador;
+int contador = 0;
+void accionPasoPaso() {
+  contador++;
+  Serial.print("Ejecutando acción. contador: ");
+  Serial.println(contador);
+  if (contador==5) {
+    temporizador.detach();
+  }
+}
 
 /*
 
 Estructura de comandos:
 
-{c: c, p: p, v: v}
+      
 
-c:0->
-c: PASOS -> avanzar [p] pasos (puede ser negativo)
+  { aceleracion: a, velocidad: v, movimiento: "paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
 
-c: POSICION -> posicion absoluta [p]
-
-c: PRINCIPIO -> Ir a principio 
-c: FIN       -> Ir a fin
-
-v: velocidad (pasos/s)
 
 
 */
 
 // 📡 Manejador de eventos del WebSocket
 void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+  Serial.printf("Evento websocket");
   switch (type) {
     case WStype_CONNECTED: {
       IPAddress ip = webSocket.remoteIP(num);
@@ -63,12 +85,45 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
       JsonDocument orden;
       deserializeJson(orden, msg);
 
-      int comando   = orden["c"];
-      int parametro = orden["p"];
-      int velocidad = orden["v"];
+      
+  /*
+  { aceleracion: a, velocidad: v, movimiento: "hola/paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
+  */
+
+      int aceleracion = orden["aceleracion"];
+      int velocidad = orden["velocidad"];
+      String movimiento = orden["movimiento"];
+      int valor = orden["valor"];
+      
+      Serial.print("aceleracion: "); Serial.print(aceleracion);
+      Serial.print(" velocidad: "); Serial.print(velocidad);
+      Serial.print(" movimiento: "); Serial.print(movimiento);
+      Serial.print(" valor: "); Serial.println(valor);
+
+
+      if (movimiento=="hola") {
+
+      } else if (movimiento=="giro") {
+        
+      } else if (movimiento=="paro") {
+
+      } else if (movimiento=="paso") {
+        pasosObjetivo = pasosActuales + valor;
+        gradosObjetivo = pasos2Grados(pasosObjetivo);
+      } else if (movimiento=="posicion") {
+        gradosObjetivo = gradosActuales + valor;
+        pasosObjetivo = grados2Pasos(gradosObjetivo);
+      } 
+
+      if (pasosObjetivo!=pasosActuales) {
+        contador=0;
+        temporizador.attach(1.0, accionPasoPaso); 
+      }
 
       JsonDocument respuesta;
-      respuesta["c"]=OK;
+      respuesta["resultado"]="OK";
+      respuesta["grados"]=gradosObjetivo;
+      respuesta["pasos"]=pasosObjetivo;
 
       String respuestaStr;
       serializeJson(respuesta, respuestaStr);
@@ -176,6 +231,11 @@ void setup(void) {
     file.close();
   });
 
+
+  gradosObjetivo = GRADOS_INICIALES;
+  gradosActuales = GRADOS_INICIALES;
+  pasosObjetivo = grados2Pasos(gradosObjetivo); 
+  pasosActuales = grados2Pasos(gradosActuales);
 
   server.begin();
   webSocket.begin();

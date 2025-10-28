@@ -11,7 +11,7 @@ export default function Pasos({ sendMessage, sendComando, xPasos }) {
 
   let temporizador;
 
-  const UMBRAL = 500; // milisegundos para considerar "pulsación larga"
+  const UMBRAL = 400; // milisegundos para considerar "pulsación larga"
 
   const handleMouseDown = (accion) => {
     temporizador = setTimeout(accion, UMBRAL * 1.1);
@@ -59,6 +59,7 @@ export default function Pasos({ sendMessage, sendComando, xPasos }) {
       }}
     >
       <input
+        className="botonPasos"
         type="button"
         id="boton_arriba"
         value="&#x2191;"
@@ -76,7 +77,10 @@ export default function Pasos({ sendMessage, sendComando, xPasos }) {
         }}
       />
 
+      &nbsp;
+
       <input
+        className="botonPasos"
         type="button"
         value="&#x23F9;"
         onClick={() => {
@@ -85,7 +89,10 @@ export default function Pasos({ sendMessage, sendComando, xPasos }) {
         }}
       />
 
+      &nbsp;
+
       <input
+        className="botonPasos"
         type="button"
         id="boton_abajo"
         value="&#x2193;"

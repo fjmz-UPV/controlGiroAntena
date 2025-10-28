@@ -38,19 +38,33 @@ function App() {
 
   const aceleracion = 100;
 
+  let conexion = false;
+
+  function procesarMensajeServidor(mensaje) {
+    // Ejemplo de mensaje: {"posicion": 90}
+  try {
+      const data = JSON.parse(mensaje);
+      if (data.posicion !== undefined) {
+        setPosicion(data.posicion);
+      }
+    } catch (error) {
+      console.error("Error al procesar el mensaje del servidor:", error);
+    }
+  }
+
   function initWebSocket() {
+        log("🌐 Intentando conectar al WebSocket...1");
+
     websocket = new WebSocket(gateway);
 
-    websocket.onopen = () => log("✅ Conectado al WebSocket");
-    websocket.onclose = () => log("❌ Desconectado del WebSocket");
-    websocket.onmessage = (event) => log("📩 " + event.data);
+    websocket.onopen  = () => { log("✅ Conectado al servidor"); conexion = true;} ;
+    websocket.onclose = () => { log("❌ Desconectado del servidor"); conexion = false;};
+    websocket.onmessage = (event) => {log("📩 " + event.data); procesarMensajeServidor(event.data);};
+
+    log("🌐 Intentando conectar al WebSocket...2");
   }
 
   /*
-  { v: velocidad, a: aceleracion, r: relativo/absoluto (true/false), p: valor }
-  { a: aceleracion, v: velocidad, pasos: pasos }
-  { a: aceleracion, v: velocidad, posicion: posicion }
-  { a; aceleracion, v: velocidad, direccion: +1/-1}
   { a: aceleracion, v: velocidad, movimiento: "paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
   */
   function sendMessage(msg) {
@@ -60,10 +74,17 @@ function App() {
     log("📤 Enviado: " + msg);
   }
 
+
   //function sendComando({ movimiento, valor }) {
   function sendComando(com) {
     const comando = { aceleracion, velocidad, ...com };
     console.log(comando);
+    try{
+      websocket.send(JSON.stringify(comando));
+    } catch (error) {
+      console.error("Error al enviar el comando:", error);
+      log("Error al enviar el comando");
+    }
   }
 
   function log(msg) {
@@ -74,7 +95,9 @@ function App() {
 
   useEffect(() => {
     setFavicon(favicon);
-    window.addEventListener("load", initWebSocket);
+    log("en UseEffect de App");
+    //window.addEventListener("load", initWebSocket);
+    initWebSocket();
   }, []);
 
   return (
