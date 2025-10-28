@@ -12,18 +12,18 @@
 #include <Ticker.h>
 
 #define OK 0
-//const char *ssid = "PWLB24";
-//const char *password = "upqmmpmll1605";
+const char *ssid = "PWLB24";
+const char *password = "upqmmpmll1605";
 
-const char *ssid = "Olimpiadas_Teleco_2.4";
-const char *password = "olimpiadas";
+//const char *ssid = "Olimpiadas_Teleco_2.4";
+//const char *password = "olimpiadas";
 
 
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
-#define RANGO_GRADOS 180
-#define GRADOS_INICIALES 92
+#define RANGO_GRADOS 90
+#define GRADOS_INICIALES 40
 float gradosObjetivo; 
 float gradosActuales; 
 
@@ -117,7 +117,7 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
 
       if (pasosObjetivo!=pasosActuales) {
         contador=0;
-        temporizador.attach(1.0, accionPasoPaso); 
+        //temporizador.attach(1.0, accionPasoPaso); 
       }
 
       JsonDocument respuesta;
@@ -127,7 +127,7 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
 
       String respuestaStr;
       serializeJson(respuesta, respuestaStr);
-      webSocket.sendTXT(num, respuestaStr);
+      //webSocket.sendTXT(num, respuestaStr);
 
 /*
       // Responder según el mensaje

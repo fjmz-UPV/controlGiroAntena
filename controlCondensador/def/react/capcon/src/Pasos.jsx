@@ -63,22 +63,16 @@ export default function Pasos({ sendMessage, sendComando, xPasos }) {
         type="button"
         id="boton_arriba"
         value="&#x2191;"
-        onMouseDown={() => {
+        onPointerDown={() => {
           t_inic_arriba = handleMouseDown(accion_largo_arriba);
+          sendMessage("OnMouseDown");
         }}
-        onMouseUp={() => {
+        onPointerUp={() => {
           handleMouseUp(t_inic_arriba, accion_corto_arriba);
-        }}
-        onTouchStart={() => {
-          t_inic_arriba = handleMouseDown(accion_largo_arriba);
-        }}
-        onTouchEnd={() => {
-          handleMouseUp(t_inic_arriba, accion_corto_arriba);
+          sendMessage("OnMouseUp");
         }}
       />
-
       &nbsp;
-
       <input
         className="botonPasos"
         type="button"
@@ -88,9 +82,8 @@ export default function Pasos({ sendMessage, sendComando, xPasos }) {
           sendComando({ movimiento: "paro" });
         }}
       />
-
       &nbsp;
-
+      {/*
       <input
         className="botonPasos"
         type="button"
@@ -106,6 +99,19 @@ export default function Pasos({ sendMessage, sendComando, xPasos }) {
           t_inic_bajo = handleMouseDown(accion_largo_abajo);
         }}
         onTouchEnd={() => {
+          handleMouseUp(t_inic_abajo, accion_corto_abajo);
+        }}
+      />
+      */}
+      <input
+        className="botonPasos"
+        type="button"
+        id="boton_abajo"
+        value="&#x2193;"
+        onPointerDown={() => {
+          t_inic_abajo = handleMouseDown(accion_largo_abajo);
+        }}
+        onPointerUp={() => {
           handleMouseUp(t_inic_abajo, accion_corto_abajo);
         }}
       />

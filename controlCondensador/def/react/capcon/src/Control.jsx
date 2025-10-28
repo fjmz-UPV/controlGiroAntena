@@ -16,9 +16,9 @@ export default function Control({
   sendMessage,
   sendComando,
 }) {
-
-
-  useEffect(() => { document.getElementById("control_posicion").value = posicionDeseada; }, [posicionDeseada]);
+  useEffect(() => {
+    document.getElementById("control_posicion").value = posicionDeseada;
+  }, [posicionDeseada]);
 
   return (
     <div
@@ -31,19 +31,18 @@ export default function Control({
         marginBottom: "20px",
       }}
     >
-
       <div
-      className="control"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: "20px",
-      }}
+        className="control"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "20px",
+        }}
       >
         <div>
-          <pre>{String(velocidad).padStart(3,"\u00A0")} pasos/s</pre>
+          <pre>{String(velocidad).padStart(3, "\u00A0")} pasos/s</pre>
         </div>
 
         <Slider
@@ -68,39 +67,43 @@ export default function Control({
         setXPasos={setXPasos}
       />
 
-
       <div
-      className="control"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: "20px",
-      }}
+        className="control"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "20px",
+        }}
       >
         <div>
-          <pre>{String(posicionDeseada).padStart(3,"\u00A0")}º</pre>
+          <pre>{String(posicionDeseada).padStart(3, "\u00A0")}º</pre>
         </div>
         <Slider
-          id = "control_posicion"
+          id="control_posicion"
           value={posicionDeseada}
           onChange={(event) => {
             setPosicionDeseada(event.target.value);
           }}
-          onMouseUp={() => {
+          onChangeCommitted={() => {
             sendMessage(goto(posicionDeseada));
             sendComando({ movimiento: "posicion", valor: posicionDeseada });
           }}
           orientation="vertical"
           style={{ height: "200px" }}
           min={0}
-          max={180}
+          max={90}
           valueLabelDisplay="auto"
         />
-
       </div>
-
     </div>
   );
 }
+
+/*
+ onMouseUp={() => {
+  sendMessage(goto(posicionDeseada));
+  sendComando({ movimiento: "posicion", valor: posicionDeseada });
+}}
+  */

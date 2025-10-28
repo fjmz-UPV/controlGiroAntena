@@ -25,12 +25,6 @@ let websocket;
 function App() {
   const [count, setCount] = useState(0);
 
-  let orden = { c: 1, p: 2, v: 3 };
-  let ordenStr = JSON.stringify(orden);
-  const posInic = 90;
-
-  const [valor, setValor] = useState(50);
-
   const [xPasos, setXPasos] = useState(1);
   const [velocidad, setVelocidad] = useState(400);
   const [posicionDeseada, setPosicionDeseada] = useState(45);
@@ -42,10 +36,10 @@ function App() {
 
   function procesarMensajeServidor(mensaje) {
     // Ejemplo de mensaje: {"posicion": 90}
-  try {
+    try {
       const data = JSON.parse(mensaje);
       if (data.posicion !== undefined) {
-        setPosicion(data.posicion);
+        //setPosicion(data.posicion);
       }
     } catch (error) {
       console.error("Error al procesar el mensaje del servidor:", error);
@@ -53,13 +47,22 @@ function App() {
   }
 
   function initWebSocket() {
-        log("🌐 Intentando conectar al WebSocket...1");
+    log("🌐 Intentando conectar al WebSocket...1");
 
     websocket = new WebSocket(gateway);
 
-    websocket.onopen  = () => { log("✅ Conectado al servidor"); conexion = true;} ;
-    websocket.onclose = () => { log("❌ Desconectado del servidor"); conexion = false;};
-    websocket.onmessage = (event) => {log("📩 " + event.data); procesarMensajeServidor(event.data);};
+    websocket.onopen = () => {
+      log("✅ Conectado al servidor");
+      conexion = true;
+    };
+    websocket.onclose = () => {
+      log("❌ Desconectado del servidor");
+      conexion = false;
+    };
+    websocket.onmessage = (event) => {
+      log("📩 " + event.data);
+      procesarMensajeServidor(event.data);
+    };
 
     log("🌐 Intentando conectar al WebSocket...2");
   }
@@ -74,12 +77,11 @@ function App() {
     log("📤 Enviado: " + msg);
   }
 
-
   //function sendComando({ movimiento, valor }) {
   function sendComando(com) {
     const comando = { aceleracion, velocidad, ...com };
     console.log(comando);
-    try{
+    try {
       websocket.send(JSON.stringify(comando));
     } catch (error) {
       console.error("Error al enviar el comando:", error);
@@ -89,8 +91,8 @@ function App() {
 
   function log(msg) {
     const logDiv = document.getElementById("log");
-    //logDiv.innerHTML += msg + "<br>";
-    logDiv.innerHTML = msg + "<br>";
+    logDiv.innerHTML += msg + "<br>";
+    //logDiv.innerHTML = msg + "<br>";
   }
 
   useEffect(() => {
