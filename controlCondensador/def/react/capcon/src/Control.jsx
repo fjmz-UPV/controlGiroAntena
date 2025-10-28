@@ -50,7 +50,7 @@ export default function Control({
           onChange={(event) => setVelocidad(event.target.value)}
           orientation="vertical"
           style={{ height: "200px" }}
-          min={0}
+          min={50}
           marks
           max={400}
           step={50}
@@ -78,7 +78,7 @@ export default function Control({
         }}
       >
         <div>
-          <pre>{String(posicionDeseada).padStart(3, "\u00A0")}º</pre>
+          <pre>{posicionDeseada.toFixed(2).padStart(5, "\u00A0") + "º"}</pre>
         </div>
         <Slider
           id="control_posicion"

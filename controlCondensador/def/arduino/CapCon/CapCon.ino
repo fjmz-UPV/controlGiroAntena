@@ -22,13 +22,14 @@ const char *password = "upqmmpmll1605";
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
-#define RANGO_GRADOS 90
+#define MAX_GRADOS 90
 #define GRADOS_INICIALES 40
 float gradosObjetivo; 
 float gradosActuales; 
 
 #define PASOS_POR_VUELTA 200
-#define MICROPASOS 4
+#define MICROPASOS 8
+int MAX_PASOS = round( (MAX_GRADOS*PASOS_POR_VUELTA*MICROPASOS)/360.0 );
 int pasosObjetivo;
 int pasosActuales;
 
@@ -43,12 +44,15 @@ float pasos2Grados(int pasos) {
 }
 
 Ticker temporizador;
+Ticker temporizadorGiro;
 int contador = 0;
 
 uint8_t socket_num;
 float inc_t = 0.1;
 
 void accionPasoPaso() {
+
+  bool fin=false;
 
   Serial.print("pasosObjetivo: "); Serial.println(pasosObjetivo);
   Serial.print("pasosActuales: "); Serial.println(pasosActuales);
@@ -59,8 +63,6 @@ void accionPasoPaso() {
     Serial.print("Tras incremento, pasosObjetivo: "); Serial.println(pasosObjetivo);
     if (pasosActuales > pasosObjetivo) {
       pasosActuales = pasosObjetivo;
-      temporizador.detach();
-      Serial.println("Objetivo alcanzado");
     }
   }
 
@@ -70,36 +72,56 @@ void accionPasoPaso() {
     Serial.print("Tras decremento, pasosObjetivo: "); Serial.println(pasosObjetivo);
     if (pasosActuales < pasosObjetivo) {
       pasosActuales = pasosObjetivo;
-      temporizador.detach();
-      Serial.println("Objetivo alcanzado");
     }
   }
 
-  enviarEstado();
-
-}
-
-
-
-/*
-void accionPasoPaso_(uint8_t num, float inc_t) {
-  contador++;
-  Serial.print("Ejecutando acción. contador: ");
-  Serial.println(contador);
-  enviarEstado(num);
-  if (contador==5) {
+  if (pasosActuales == pasosObjetivo) {
+    fin = true;
     temporizador.detach();
+    Serial.println("Objetivo alcanzado");
   }
-}
-*/
 
-void enviarEstado() {
+  enviarEstado(fin);
+
+}
+
+bool sentido;
+
+void girar() {
+    bool fin = false;
+    if (sentido) {
+      pasosActuales += velocidad*inc_t;
+      if (pasosActuales>MAX_PASOS) {
+        pasosActuales=MAX_PASOS; 
+        fin = true; 
+      }
+    } else {
+      pasosActuales -= velocidad*inc_t;
+      if (pasosActuales<0) {
+        pasosActuales=0;
+        fin = true;
+      }
+    }
+    pasosObjetivo = pasosActuales;
+    enviarEstado(fin);
+}
+
+void parar() {
+   temporizadorGiro.detach();
+   enviarEstado(true);
+}
+
+
+
+void enviarEstado(bool fin) {
   JsonDocument respuesta;
   respuesta["op"]="estado";
+  respuesta["MAX_GRADOS"]=MAX_GRADOS;
   respuesta["grados"]=pasos2Grados(pasosActuales);
   respuesta["pasos"]=pasosActuales;
   respuesta["fc1"]=false;
   respuesta["fc2"]=false;
+  respuesta["fin"]= fin;
   String respuestaStr;
   serializeJson(respuesta, respuestaStr);
   webSocket.sendTXT(socket_num, respuestaStr);
@@ -142,11 +164,11 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
 
       
       /*
-      { aceleracion: a, velocidad: v, movimiento: "hola/paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
+      { aceleracion: a, velocidad: v, movimiento: "hola/paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+1/-1)}  
       */
 
       int aceleracion = orden["aceleracion"];
-      int velocidad = orden["velocidad"];
+      velocidad = orden["velocidad"];
       String movimiento = orden["movimiento"];
       int valor = orden["valor"];
       
@@ -157,16 +179,19 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
 
 
       if (movimiento=="hola") {
-          enviarEstado();
+          enviarEstado(true);
       } else if (movimiento=="giro") {
-        
+        sentido = (valor==+1)? true : false;
+        temporizadorGiro.attach(inc_t, girar); 
       } else if (movimiento=="paro") {
-
+        parar();
       } else if (movimiento=="paso") {
         pasosObjetivo = pasosActuales + valor;
+        if (pasosObjetivo > MAX_PASOS) pasosObjetivo = MAX_PASOS;
+        else if (pasosObjetivo < 0 )    pasosObjetivo = 0.;
         gradosObjetivo = pasos2Grados(pasosObjetivo);
       } else if (movimiento=="posicion") {
-        gradosObjetivo = gradosActuales + valor;
+        gradosObjetivo = valor;
         pasosObjetivo = grados2Pasos(gradosObjetivo);
       } 
 

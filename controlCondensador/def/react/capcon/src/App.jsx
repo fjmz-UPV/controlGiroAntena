@@ -39,6 +39,7 @@ function App() {
     try {
       const data = JSON.parse(mensaje);
       if (data.op !== undefined && data.grados !== undefined) {
+        if (data.fin) setPosicionDeseada(data.grados);
         setPosicion(data.grados);
       }
     } catch (error) {
