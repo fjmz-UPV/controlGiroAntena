@@ -38,33 +38,36 @@ function App() {
     // Ejemplo de mensaje: {"posicion": 90}
     try {
       const data = JSON.parse(mensaje);
-      if (data.posicion !== undefined) {
-        //setPosicion(data.posicion);
+      if (data.op !== undefined && data.grados !== undefined) {
+        setPosicion(data.grados);
       }
     } catch (error) {
       console.error("Error al procesar el mensaje del servidor:", error);
     }
   }
 
+  function printEstadoConexion(mensaje) {
+    document.getElementById("estadoConexion").innerHTML = mensaje;
+  }
+
   function initWebSocket() {
-    log("🌐 Intentando conectar al WebSocket...1");
+    printEstadoConexion("🌐 Intentando conectar con el servidor");
 
     websocket = new WebSocket(gateway);
 
     websocket.onopen = () => {
-      log("✅ Conectado al servidor");
+      printEstadoConexion("✅ Conectado al servidor");
       conexion = true;
+      sendComando({ movimiento: "hola" });
     };
     websocket.onclose = () => {
-      log("❌ Desconectado del servidor");
+      printEstadoConexion("❌ Desconectado del servidor");
       conexion = false;
     };
     websocket.onmessage = (event) => {
       log("📩 " + event.data);
       procesarMensajeServidor(event.data);
     };
-
-    log("🌐 Intentando conectar al WebSocket...2");
   }
 
   /*
@@ -91,14 +94,13 @@ function App() {
 
   function log(msg) {
     const logDiv = document.getElementById("log");
-    logDiv.innerHTML += msg + "<br>";
+    logDiv.innerHTML += "\n" + msg;
     //logDiv.innerHTML = msg + "<br>";
   }
 
   useEffect(() => {
     setFavicon(favicon);
     log("en UseEffect de App");
-    //window.addEventListener("load", initWebSocket);
     initWebSocket();
   }, []);
 
@@ -112,6 +114,8 @@ function App() {
         justifyContent: "space-between",
       }}
     >
+      <div id="estadoConexion"></div>
+
       <Display sendMessage={sendMessage} posicion={posicion} />
 
       <Control
@@ -127,7 +131,19 @@ function App() {
 
       <Memorias />
 
-      <div id="log" className="log"></div>
+      <textarea
+        id="log"
+        style={{
+          width: "100%",
+          minHeight: "6em",
+          resize: "vertical",
+          overflow: "auto",
+          touchAction: "auto",
+          WebkitUserSelect: "text",
+          MozUserSelect: "text",
+          pointerEvents: "auto",
+        }}
+      />
     </div>
   );
 }

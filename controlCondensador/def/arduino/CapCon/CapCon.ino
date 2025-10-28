@@ -28,12 +28,14 @@ float gradosObjetivo;
 float gradosActuales; 
 
 #define PASOS_POR_VUELTA 200
-#define MICROPASOS 1
+#define MICROPASOS 4
 int pasosObjetivo;
 int pasosActuales;
 
+int velocidad = 400; // pasos/segundo
+
 int grados2Pasos(float grados) {
-    return int( (PASOS_POR_VUELTA*MICROPASOS*grados)/360. );
+    return int( round( (PASOS_POR_VUELTA*MICROPASOS*grados)/360.) );
 }
 
 float pasos2Grados(int pasos) {
@@ -42,13 +44,65 @@ float pasos2Grados(int pasos) {
 
 Ticker temporizador;
 int contador = 0;
+
+uint8_t socket_num;
+float inc_t = 0.1;
+
 void accionPasoPaso() {
+
+  Serial.print("pasosObjetivo: "); Serial.println(pasosObjetivo);
+  Serial.print("pasosActuales: "); Serial.println(pasosActuales);
+
+  if (pasosObjetivo > pasosActuales) {
+    Serial.println("pasosObjetivo > pasosActuales");
+    pasosActuales += velocidad*inc_t;
+    Serial.print("Tras incremento, pasosObjetivo: "); Serial.println(pasosObjetivo);
+    if (pasosActuales > pasosObjetivo) {
+      pasosActuales = pasosObjetivo;
+      temporizador.detach();
+      Serial.println("Objetivo alcanzado");
+    }
+  }
+
+  if (pasosObjetivo < pasosActuales) {
+    Serial.println("pasosObjetivo < pasosActuales");
+    pasosActuales -= velocidad*inc_t;
+    Serial.print("Tras decremento, pasosObjetivo: "); Serial.println(pasosObjetivo);
+    if (pasosActuales < pasosObjetivo) {
+      pasosActuales = pasosObjetivo;
+      temporizador.detach();
+      Serial.println("Objetivo alcanzado");
+    }
+  }
+
+  enviarEstado();
+
+}
+
+
+
+/*
+void accionPasoPaso_(uint8_t num, float inc_t) {
   contador++;
   Serial.print("Ejecutando acción. contador: ");
   Serial.println(contador);
+  enviarEstado(num);
   if (contador==5) {
     temporizador.detach();
   }
+}
+*/
+
+void enviarEstado() {
+  JsonDocument respuesta;
+  respuesta["op"]="estado";
+  respuesta["grados"]=pasos2Grados(pasosActuales);
+  respuesta["pasos"]=pasosActuales;
+  respuesta["fc1"]=false;
+  respuesta["fc2"]=false;
+  String respuestaStr;
+  serializeJson(respuesta, respuestaStr);
+  webSocket.sendTXT(socket_num, respuestaStr);
 }
 
 /*
@@ -65,6 +119,7 @@ Estructura de comandos:
 
 // 📡 Manejador de eventos del WebSocket
 void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+  socket_num = num;
   Serial.printf("Evento websocket");
   switch (type) {
     case WStype_CONNECTED: {
@@ -86,9 +141,9 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
       deserializeJson(orden, msg);
 
       
-  /*
-  { aceleracion: a, velocidad: v, movimiento: "hola/paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
-  */
+      /*
+      { aceleracion: a, velocidad: v, movimiento: "hola/paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
+      */
 
       int aceleracion = orden["aceleracion"];
       int velocidad = orden["velocidad"];
@@ -102,7 +157,7 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
 
 
       if (movimiento=="hola") {
-
+          enviarEstado();
       } else if (movimiento=="giro") {
         
       } else if (movimiento=="paro") {
@@ -116,8 +171,7 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
       } 
 
       if (pasosObjetivo!=pasosActuales) {
-        contador=0;
-        //temporizador.attach(1.0, accionPasoPaso); 
+        temporizador.attach(inc_t, accionPasoPaso); 
       }
 
       JsonDocument respuesta;
