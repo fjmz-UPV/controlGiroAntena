@@ -12,11 +12,11 @@
 #include <Ticker.h>
 
 #define OK 0
-const char *ssid = "PWLB24";
-const char *password = "upqmmpmll1605";
+//const char *ssid = "PWLB24";
+//const char *password = "upqmmpmll1605";
 
-//const char *ssid = "Olimpiadas_Teleco_2.4";
-//const char *password = "olimpiadas";
+const char *ssid = "Olimpiadas_Teleco_2.4";
+const char *password = "olimpiadas";
 
 
 WebServer server(80);

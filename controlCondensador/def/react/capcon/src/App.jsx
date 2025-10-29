@@ -5,6 +5,7 @@ import "./estilos.css";
 import Display from "./Display.jsx";
 import Control from "./Control.jsx";
 import Memorias from "./Memorias.jsx";
+import Botonera from "./Botonera.jsx";
 
 import favicon from "./assets/favicon.svg";
 
@@ -131,6 +132,8 @@ function App() {
       />
 
       <Memorias />
+
+      <Botonera sendComando={sendComando} posicion={posicionDeseada}/>
 
       <textarea
         id="log"
