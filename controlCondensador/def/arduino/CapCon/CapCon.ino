@@ -15,8 +15,11 @@
 //const char *ssid = "PWLB24";
 //const char *password = "upqmmpmll1605";
 
-const char *ssid = "Olimpiadas_Teleco_2.4";
-const char *password = "olimpiadas";
+//const char *ssid = "Olimpiadas_Teleco_2.4";
+//const char *password = "olimpiadas";
+
+const char *ssid = "MdP";
+const char *password = "lerelereleyole";
 
 
 WebServer server(80);
@@ -124,6 +127,24 @@ void enviarEstado(bool fin) {
   respuesta["fin"]= fin;
   String respuestaStr;
   serializeJson(respuesta, respuestaStr);
+  Serial.print("Estado a enviar: "); Serial.println(respuestaStr);
+  webSocket.sendTXT(socket_num, respuestaStr);
+}
+
+void enviarSaludo() {
+  JsonDocument respuesta;
+  respuesta["op"]="hola";
+  respuesta["MAX_GRADOS"]=MAX_GRADOS;
+  respuesta["GRADOS_INICIALES"]=GRADOS_INICIALES;
+  respuesta["PASOS_POR_VUELTA"]=PASOS_POR_VUELTA;
+  respuesta["MICROPASOS"]=MICROPASOS;
+  respuesta["pasos"]=pasosActuales;
+  respuesta["grados"]=pasos2Grados(pasosActuales);
+  respuesta["fc1"]=false;
+  respuesta["fc2"]=false;
+  String respuestaStr;
+  serializeJson(respuesta, respuestaStr);
+  Serial.print("Saludo a enviar: "); Serial.println(respuestaStr);
   webSocket.sendTXT(socket_num, respuestaStr);
 }
 
@@ -142,12 +163,12 @@ Estructura de comandos:
 // 📡 Manejador de eventos del WebSocket
 void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
   socket_num = num;
-  Serial.printf("Evento websocket");
+  Serial.println("Evento websocket");
   switch (type) {
     case WStype_CONNECTED: {
       IPAddress ip = webSocket.remoteIP(num);
       Serial.printf("[%u] Conectado desde %s\n", num, ip.toString().c_str());
-      webSocket.sendTXT(num, "Conexión establecida con ESP32");
+      //webSocket.sendTXT(num, "Conexión establecida con ESP32");
       break;
     }
     case WStype_DISCONNECTED:
@@ -170,7 +191,7 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
       int aceleracion = orden["aceleracion"];
       velocidad = orden["velocidad"];
       String movimiento = orden["movimiento"];
-      int valor = orden["valor"];
+      float valor = orden["valor"];
       
       Serial.print("aceleracion: "); Serial.print(aceleracion);
       Serial.print(" velocidad: "); Serial.print(velocidad);
@@ -179,7 +200,7 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
 
 
       if (movimiento=="hola") {
-          enviarEstado(true);
+          enviarSaludo();
       } else if (movimiento=="giro") {
         sentido = (valor==+1)? true : false;
         temporizadorGiro.attach(inc_t, girar); 

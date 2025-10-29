@@ -37,11 +37,19 @@ function App() {
 
   function procesarMensajeServidor(mensaje) {
     // Ejemplo de mensaje: {"posicion": 90}
+    console.log("Mensaje recibido: " + mensaje);
     try {
       const data = JSON.parse(mensaje);
-      if (data.op !== undefined && data.grados !== undefined) {
-        if (data.fin) setPosicionDeseada(data.grados);
-        setPosicion(data.grados);
+      if (data != null) {
+        if (data.op == "hola") {
+          setPosicion(data.grados);
+          setPosicionDeseada(data.grados);
+          console.log("Recibido saludo");
+        } else if (data.op == "estado") {
+          if (data.fin) setPosicionDeseada(data.grados);
+          setPosicion(data.grados);
+          console.log("Recibido estado con fin: " + data.fin);
+        }
       }
     } catch (error) {
       console.error("Error al procesar el mensaje del servidor:", error);
@@ -95,8 +103,8 @@ function App() {
   }
 
   function log(msg) {
-    const logDiv = document.getElementById("log");
-    logDiv.innerHTML += "\n" + msg;
+    //const logDiv = document.getElementById("log");
+    //logDiv.innerHTML += "\n" + msg;
     //logDiv.innerHTML = msg + "<br>";
   }
 
@@ -133,8 +141,9 @@ function App() {
 
       <Memorias />
 
-      <Botonera sendComando={sendComando} posicion={posicionDeseada}/>
+      <Botonera sendComando={sendComando} posicion={posicionDeseada} />
 
+      {/*
       <textarea
         id="log"
         style={{
@@ -148,6 +157,7 @@ function App() {
           pointerEvents: "auto",
         }}
       />
+      */}
     </div>
   );
 }
