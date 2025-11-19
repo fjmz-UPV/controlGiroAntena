@@ -1,10 +1,13 @@
-import Slider from "@mui/material/Slider";
-import GroupOrientation from "./ControlPasos";
+
 import ControlPasos from "./ControlPasos";
 import Pasos from "./Pasos";
+import Deslizador from "./Deslizador";
 
-import { goto } from "./comandos";
 import { useEffect } from "react";
+
+
+
+
 
 export default function Control({
   velocidad,
@@ -13,14 +16,17 @@ export default function Control({
   setAceleracion,
   xPasos,
   setXPasos,
-  posicionDeseada,
-  setPosicionDeseada,
-  sendMessage,
+  porcentajeDeseado,
+  setporcentajeDeseado,
   sendComando,
 }) {
+
+  /*
   useEffect(() => {
-    document.getElementById("control_posicion").value = posicionDeseada;
-  }, [posicionDeseada]);
+    document.getElementById("sliderPorcentaje").value = porcentajeDeseado;
+    console.log("porcentajeDeseado cambiado a " + porcentajeDeseado);
+  }, [porcentajeDeseado]);
+*/
 
   return (
     <div
@@ -33,106 +39,29 @@ export default function Control({
         marginBottom: "20px",
       }}
     >
-      <div
-        className="control"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <div>
-          <pre>{String(aceleracion).padStart(4, "\u00A0")} pasos/s<sup>2</sup> </pre>
-        </div>
+      
 
-        <Slider
-          value={aceleracion}
-          onChange={(event) => setAceleracion(event.target.value)}
-          orientation="vertical"
-          style={{ height: "200px" }}
-          min={100}
-          marks
-          max={1000}
-          step={50}
-          valueLabelDisplay="auto"
-        />
-      </div>
+      <Deslizador idSlider={"sliderVelocidad"} concepto={velocidad} conceptoStr={"Velocidad"} unidades={"pasos/s"} expo={""} setConcepto={setVelocidad} minimo={50} maximo={400} paso={50} />
 
-      <div
-        className="control"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <div>
-          <pre>{String(velocidad).padStart(3, "\u00A0")} pasos/s</pre>
-        </div>
-
-        <Slider
-          value={velocidad}
-          onChange={(event) => setVelocidad(event.target.value)}
-          orientation="vertical"
-          style={{ height: "200px" }}
-          min={50}
-          marks
-          max={400}
-          step={50}
-          valueLabelDisplay="auto"
-        />
-      </div>
+      <Deslizador idSlider={"sliderAceleracion"} concepto={aceleracion} conceptoStr={"Aceleración"} unidades={"pasos/s"} expoDenom={"2"} setConcepto={setAceleracion} minimo={100} maximo={1000} paso={50} />
 
       <ControlPasos xPasos={xPasos} setXPasos={setXPasos} />
 
       <Pasos
-        sendMessage={sendMessage}
         sendComando={sendComando}
         xPasos={xPasos}
         setXPasos={setXPasos}
       />
 
-      <div
-        className="control"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <div>
-          <pre>{posicionDeseada.toFixed(2).padStart(5, "\u00A0") + "º"}</pre>
-        </div>
-        <Slider
-          id="control_posicion"
-          value={posicionDeseada}
-          onChange={(event) => {
-            setPosicionDeseada(event.target.value);
-          }}
-          onChangeCommitted={() => {
-            sendMessage(goto(posicionDeseada));
-            sendComando({ movimiento: "posicion", valor: posicionDeseada });
-          }}
-          orientation="vertical"
-          style={{ height: "200px" }}
-          min={0}
-          max={90}
-          valueLabelDisplay="auto"
-        />
-      </div>
+
+      <Deslizador idSlider={"sliderPorcentaje"} concepto={porcentajeDeseado} conceptoStr={"Posición"} unidades={"%"} expoDenom={""} setConcepto={setporcentajeDeseado} minimo={0} maximo={100} paso={1} enviarComando={true} sendComando={sendComando}/>
+
+
+
     </div>
   );
 }
 
-/*
- onMouseUp={() => {
-  sendMessage(goto(posicionDeseada));
-  sendComando({ movimiento: "posicion", valor: posicionDeseada });
-}}
-  */
+
+
+

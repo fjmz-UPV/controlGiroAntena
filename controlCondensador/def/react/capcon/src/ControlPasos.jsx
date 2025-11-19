@@ -8,8 +8,8 @@ export default function ControlPasos({ xPasos, setXPasos }) {
 
   const handleChange = (e, nv) => {
     setView(nv);
-    console.log(e.target.value);
-    setXPasos(e.target.value);
+    console.log(e.target.value*1);
+    setXPasos(e.target.value*1);
   };
 
   return (

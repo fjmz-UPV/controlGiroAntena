@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { antes, despues } from "./comandos.js";
 
-export default function Display({ sendMessage, posicion }) {
+export default function Display({ porcentaje }) {
   useEffect(() => {
     // Any necessary setup can be done here
-  }, [posicion]);
+  }, [porcentaje]);
 
   return (
     <div
@@ -17,7 +17,7 @@ export default function Display({ sendMessage, posicion }) {
       }}
     >
       <div style={{ fontSize: "3em", fontWeight: "bold" }}>
-        <pre>{posicion.toFixed(2).padStart(5, "\u00A0") + "º"}</pre>
+        <pre>{porcentaje.toFixed(2).padStart(5, "\u00A0") + "º"}</pre>
       </div>
     </div>
   );

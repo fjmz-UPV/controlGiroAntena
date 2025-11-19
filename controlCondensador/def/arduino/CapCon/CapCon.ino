@@ -45,7 +45,8 @@ int MAX_PASOS = round( (MAX_GRADOS*PASOS_POR_VUELTA*MICROPASOS)/360.0 );
 int pasosObjetivo;
 int pasosActuales;
 
-int velocidad = 400; // pasos/segundo
+int velocidad; // pasos/segundo
+int aceleracion; // pasos/segundo^2
 
 int grados2Pasos(float grados) {
     return int( round( (PASOS_POR_VUELTA*MICROPASOS*grados)/360.) );
@@ -148,7 +149,35 @@ void gotoPasos(int aceleracion, int velocidad, int pasos) {
   motor.moveTo((long)pasos);
 }
 
+
+int pasos;
+int pasos_por_vuelta;
+int micropasos;
+float porcentaje_fc1;
+float porcentaje_fc2;
+float porcentaje_por_paso;
+float grados;
+boolean estado_fc1;
+boolean estado_fc2;
+
+
+ // { comando: "estado", pasos: (pasos), fin: true/false, estado_fc1: false/true, estado_fc2: false/true }
+
+
 void enviarEstado(bool fin) {
+  JsonDocument respuesta;
+  respuesta["comando"]    = "estado";
+  respuesta["pasos"]      = pasos;
+  respuesta["estado_fc1"] = estado_fc1;
+  respuesta["estado_fc2"] = estado_fc2;
+  respuesta["fin"]        = fin;
+  String respuestaStr;
+  serializeJson(respuesta, respuestaStr);
+  webSocket.sendTXT(socket_num, respuestaStr);
+}
+
+/*
+void enviarEstado__(bool fin) {
   JsonDocument respuesta;
   respuesta["op"]="estado";
   respuesta["MAX_GRADOS"]=MAX_GRADOS;
@@ -177,7 +206,64 @@ void enviarEstado_(bool fin) {
   Serial.print("Estado a enviar: "); Serial.println(respuestaStr);
   webSocket.sendTXT(socket_num, respuestaStr);
 }
+*/
 
+/*
+  motor->movil: (x) valor entero, [x] valor real
+  { comando: "config", 
+    pasos: (pasos), 
+    pasos_por_vuelta: (pasos), 
+    micropasos: (factor), 
+    porcentaje_fc1: [porcentaje], 
+    porcentaje_fc2: [porcentaje], 
+    porcentaje_por_paso: [porcentaje], 
+    fc1: false/true, 
+    fc2: false/true }
+*/
+
+
+  float GRADOS_INIC              = 0.f;
+  float GRADOS                   = 90.f; 
+  int   PASOS_INIC               = 45;
+  int   PASOS_POR_VUELTA_INIC    = 200;
+  int   MICROPASOS_INIC          = 8;
+  float PORCENTAJE_FC1_INIC      = 10.f;
+  float PORCENTAJE_FC2_INIC      = 10.f;
+  float PORCENTAJE_POR_PASO_INIC = (100.f * 360.f) / (PASOS_POR_VUELTA_INIC * MICROPASOS * GRADOS);
+  float ESTADO_FC1_INIC          = true;
+  float ESTADO_FC2_INIC          = true;
+
+void cargarConfigInicial() {
+  pasos               = PASOS_INIC;
+  pasos_por_vuelta    = PASOS_POR_VUELTA_INIC;
+  micropasos          = MICROPASOS_INIC;
+  porcentaje_fc1      = PORCENTAJE_FC1_INIC;
+  porcentaje_fc2      = PORCENTAJE_FC2_INIC;
+  porcentaje_por_paso = PORCENTAJE_POR_PASO_INIC;
+  grados              = GRADOS;
+  estado_fc1          = ESTADO_FC1_INIC;
+  estado_fc2          = ESTADO_FC2_INIC;
+}
+
+void enviarConfig() {
+  JsonDocument respuesta;
+  respuesta["comando"]             = "config";
+  respuesta["pasos"]               = pasos;
+  respuesta["pasos_por_vuelta"]    = pasos_por_vuelta;
+  respuesta["micropasos"]          = micropasos;
+  respuesta["porcentaje_fc1"]      = porcentaje_fc1;
+  respuesta["porcentaje_fc2"]      = porcentaje_fc2;
+  respuesta["porcentaje_por_paso"] = porcentaje_por_paso;
+  respuesta["grados"]              = grados;
+  respuesta["estado_fc1"]          = estado_fc1;
+  respuesta["estado_fc2"]          = estado_fc2;
+  String respuestaStr;
+  serializeJson(respuesta, respuestaStr);
+  Serial.print("Saludo a enviar: "); Serial.println(respuestaStr);
+  webSocket.sendTXT(socket_num, respuestaStr);
+}
+
+/*
 void enviarSaludo() {
   JsonDocument respuesta;
   respuesta["op"]="hola";
@@ -212,18 +298,27 @@ void enviarSaludo_() {
   Serial.print("Saludo a enviar: "); Serial.println(respuestaStr);
   webSocket.sendTXT(socket_num, respuestaStr);
 }
-
-/*
-
-Estructura de comandos:
-
-      
-
-  { aceleracion: a, velocidad: v, movimiento: "paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
-
-
-
 */
+
+  /*
+  { a: aceleracion, v: velocidad, movimiento: "paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
+
+  { a: aceleracion, v: velocidad, c: comando ("hola"/"estado"/"paro"/"pasos"/"posicion"/"giro"), valor: pasos/posicion/(+/-1)}
+
+  movil->motor: (x) valor entero
+  { comando: "hola" }
+  { comando: "pasos",    valor: (pasos),      velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+  { comando: "giro",     valor: +1/-1,        velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+  { comando: "posicion", valor: (porcentaje), velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+  { comando: "paro",     valor: true/false,   velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+
+
+  motor->movil: (x) valor entero, [x] valor real
+  { comando: "config", pasos: (pasos), grados_fc1: [grados], grados_fc2: [grados], pasos_rev: (pasos), micropasos: (factor), fc1: false/true, fc2: false/true }
+
+  { comando: "estado", pasos: (pasos), fin: true/false, fc1: false/true, fc2: false/true }
+
+  */
 
 // 📡 Manejador de eventos del WebSocket
 void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
@@ -248,39 +343,45 @@ void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t leng
       JsonDocument orden;
       deserializeJson(orden, msg);
 
-      
-      /*
-      { aceleracion: a, velocidad: v, movimiento: "hola/paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+1/-1)}  
-      */
 
-      int aceleracion = orden["aceleracion"];
-      velocidad = orden["velocidad"];
-      String movimiento = orden["movimiento"];
-      float valor = orden["valor"];
+    /*
+      { comando: "hola" }
+      { comando: "pasos",    valor: (pasos),      velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+      { comando: "giro",     valor: +1/-1,        velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+      { comando: "posicion", valor: (porcentaje), velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+      { comando: "paro",     valor: true/false,   velocidad: (pasos/s), aceleracion: (pasos/s^2) }
+    */
+
+      String comando = orden["comando"];
+      float valor    = orden["valor"];
+      aceleracion    = orden["aceleracion"];
+      velocidad      = orden["velocidad"];
+
       
       Serial.print("aceleracion: "); Serial.print(aceleracion);
-      Serial.print(" velocidad: "); Serial.print(velocidad);
-      Serial.print(" movimiento: "); Serial.print(movimiento);
-      Serial.print(" valor: "); Serial.println(valor);
+      Serial.print(" velocidad: ");  Serial.print(velocidad);
+      Serial.print(" movimiento: "); Serial.print(comando);
+      Serial.print(" valor: ");      Serial.println(valor);
 
 
-      if (movimiento=="hola") {
-          enviarSaludo();
-      } else if (movimiento=="giro") {
+      if (comando=="hola") {
+          //enviarSaludo();
+          enviarConfig();
+      } else if (comando=="giro") {
         //sentido = (valor==+1)? true : false;
         //temporizadorGiro.attach(inc_t, girar_); 
         girar(aceleracion, velocidad);
-      } else if (movimiento=="paro") {
+      } else if (comando=="paro") {
         //parar_();
         parar();
-      } else if (movimiento=="paso") {
+      } else if (comando=="pasos") {
         /*pasosObjetivo = pasosActuales + valor;
         if (pasosObjetivo > MAX_PASOS) pasosObjetivo = MAX_PASOS;
         else if (pasosObjetivo < 0 )    pasosObjetivo = 0.;
         gradosObjetivo = pasos2Grados(pasosObjetivo);
         */
         incPasos(aceleracion, velocidad, valor);
-      } else if (movimiento=="posicion") {
+      } else if (comando=="posicion") {
         //gradosObjetivo = valor;
         //pasosObjetivo = grados2Pasos(gradosObjetivo);
         gotoPasos(aceleracion, velocidad, valor);
@@ -404,6 +505,8 @@ void setup(void) {
     file.close();
   });
 
+
+  cargarConfigInicial();
 
   gradosObjetivo = GRADOS_INICIALES;
   gradosActuales = GRADOS_INICIALES;
