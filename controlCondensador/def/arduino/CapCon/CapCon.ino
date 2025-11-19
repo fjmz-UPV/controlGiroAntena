@@ -159,7 +159,7 @@ void enviarEstado(bool fin) {
   respuesta["fin"]= fin;
   String respuestaStr;
   serializeJson(respuesta, respuestaStr);
-  Serial.print("Estado a enviar: "); Serial.println(respuestaStr);
+  //Serial.print("Estado a enviar: "); Serial.println(respuestaStr);
   webSocket.sendTXT(socket_num, respuestaStr);
 }
 

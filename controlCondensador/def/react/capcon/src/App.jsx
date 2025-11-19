@@ -28,10 +28,11 @@ function App() {
 
   const [xPasos, setXPasos] = useState(1);
   const [velocidad, setVelocidad] = useState(400);
+  const [aceleracion, setAceleracion] = useState(500);
+
   const [posicionDeseada, setPosicionDeseada] = useState(45);
   const [posicion, setPosicion] = useState(45);
 
-  const aceleracion = 100;
 
   let conexion = false;
 
@@ -131,6 +132,8 @@ function App() {
       <Control
         velocidad={velocidad}
         setVelocidad={setVelocidad}
+        aceleracion={aceleracion}
+        setAceleracion={setAceleracion}
         xPasos={xPasos}
         setXPasos={setXPasos}
         posicionDeseada={posicionDeseada}

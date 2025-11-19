@@ -9,6 +9,8 @@ import { useEffect } from "react";
 export default function Control({
   velocidad,
   setVelocidad,
+  aceleracion,
+  setAceleracion,
   xPasos,
   setXPasos,
   posicionDeseada,
@@ -31,6 +33,33 @@ export default function Control({
         marginBottom: "20px",
       }}
     >
+      <div
+        className="control"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <div>
+          <pre>{String(aceleracion).padStart(4, "\u00A0")} pasos/s<sup>2</sup> </pre>
+        </div>
+
+        <Slider
+          value={aceleracion}
+          onChange={(event) => setAceleracion(event.target.value)}
+          orientation="vertical"
+          style={{ height: "200px" }}
+          min={100}
+          marks
+          max={1000}
+          step={50}
+          valueLabelDisplay="auto"
+        />
+      </div>
+
       <div
         className="control"
         style={{
