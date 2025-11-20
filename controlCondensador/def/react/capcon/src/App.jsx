@@ -87,16 +87,16 @@ function App() {
       if (data != null) {
         if (data.comando == "config") {
 
-          setPorcentaje(pasos2Porcentaje(data.pasos));
-          setporcentajeDeseado(pasos2Porcentaje(data.pasos));
           pasos_por_vuelta    = data.pasos_vuelta;
           micropasos          = data.micropasos;
+          max_grados          = data.max_grados;
           porcentaje_fc1      = data.porcentaje_fc1;
           porcentaje_fc2      = data.porcentaje_fc2;
           porcentaje_por_paso = data.porcentaje_por_paso;
-          grados              = data.grados;
           estado_fc1          = data.estado_fc1;
           estado_fc2          = data.estado_fc2;
+          setPorcentaje(pasos2Porcentaje(data.pasos));
+          setporcentajeDeseado(pasos2Porcentaje(data.pasos));
           console.log("Configuración recibida.");
         
         } else if (data.comando == "estado") {

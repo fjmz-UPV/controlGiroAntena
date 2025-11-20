@@ -17,7 +17,7 @@ export default function Display({ porcentaje }) {
       }}
     >
       <div style={{ fontSize: "3em", fontWeight: "bold" }}>
-        <pre>{porcentaje.toFixed(2).padStart(5, "\u00A0") + "º"}</pre>
+        <pre>{porcentaje.toFixed(2).padStart(5, "\u00A0") + " %"}</pre>
       </div>
     </div>
   );
