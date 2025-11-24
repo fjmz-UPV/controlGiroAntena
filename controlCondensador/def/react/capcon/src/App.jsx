@@ -22,15 +22,14 @@ const gateway = `ws://${window.location.hostname}:81/`;
 //const gateway = "ws://con2.local:81/";
 let websocket;
 
-
-  let porcentaje_fc1 = null;
-  let porcentaje_fc2 = null;
-  let pasos_por_vuelta = null;
-  let porcentaje_por_paso = null;
-  let micropasos = null;
-  let grados = null;
-  let estado_fc1 = null;
-  let estado_fc2 = null;
+let porcentaje_fc1 = null;
+let porcentaje_fc2 = null;
+let pasos_por_vuelta = null;
+let porcentaje_por_paso = null;
+let micropasos = null;
+let grados = null;
+let estado_fc1 = null;
+let estado_fc2 = null;
 
 function pasos2Porcentaje(pasos) {
   return pasos * porcentaje_por_paso;
@@ -40,7 +39,9 @@ function porcentaje2Pasos(porcentaje) {
   return porcentaje / porcentaje_por_paso;
 }
 
-
+function anotar(msg) {
+  document.getElementById("log").innerHTML = msg;
+}
 
 function App() {
   const [count, setCount] = useState(0);
@@ -52,10 +53,7 @@ function App() {
   const [porcentajeDeseado, setporcentajeDeseado] = useState(45.5);
   const [porcentaje, setPorcentaje] = useState(45.5);
 
-
   let conexion = false;
-
-
 
   /*
   { a: aceleracion, v: velocidad, movimiento: "paro/pasos"/"posicion"/"giro" valor: pasos/posicion/(+/-1)}  
@@ -77,30 +75,26 @@ function App() {
 
   */
 
-
-
-
   function procesarMensajeServidor(mensaje) {
     console.log("Mensaje recibido: " + mensaje);
     try {
       const data = JSON.parse(mensaje);
       if (data != null) {
-        if (data.comando == "config") {
+        anotar(mensaje);
 
-          pasos_por_vuelta    = data.pasos_vuelta;
-          micropasos          = data.micropasos;
-          max_grados          = data.max_grados;
-          porcentaje_fc1      = data.porcentaje_fc1;
-          porcentaje_fc2      = data.porcentaje_fc2;
+        if (data.comando == "config") {
+          pasos_por_vuelta = data.pasos_vuelta;
+          micropasos = data.micropasos;
+          max_grados = data.max_grados;
+          porcentaje_fc1 = data.porcentaje_fc1;
+          porcentaje_fc2 = data.porcentaje_fc2;
           porcentaje_por_paso = data.porcentaje_por_paso;
-          estado_fc1          = data.estado_fc1;
-          estado_fc2          = data.estado_fc2;
+          estado_fc1 = data.estado_fc1;
+          estado_fc2 = data.estado_fc2;
           setPorcentaje(pasos2Porcentaje(data.pasos));
           setporcentajeDeseado(pasos2Porcentaje(data.pasos));
           console.log("Configuración recibida.");
-        
         } else if (data.comando == "estado") {
-
           if (data.fin) setporcentajeDeseado(pasos2Porcentaje(data.pasos));
           setPorcentaje(pasos2Porcentaje(data.pasos));
           console.log("Recibido estado con fin: " + data.fin);
@@ -134,20 +128,19 @@ function App() {
     };
   }
 
-
-
-
   function sendComando(com) {
     const comando = { ...com, velocidad, aceleracion };
     console.log(comando);
     try {
       websocket.send(JSON.stringify(comando));
     } catch (error) {
-      console.error("Error al enviar el comando " + JSON.stringify(comando), "Error: ", error);      
+      console.error(
+        "Error al enviar el comando " + JSON.stringify(comando),
+        "Error: ",
+        error
+      );
     }
   }
-
-
 
   useEffect(() => {
     setFavicon(favicon);
@@ -180,11 +173,9 @@ function App() {
         sendComando={sendComando}
       />
 
-      
-
       <Botonera sendComando={sendComando} porcentaje={porcentajeDeseado} />
 
-
+      <div id="log"></div>
     </div>
   );
 }

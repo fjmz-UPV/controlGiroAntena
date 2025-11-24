@@ -21,11 +21,11 @@
 AccelStepper motor(AccelStepper::DRIVER, STEP_PIN, DIR_PIN);
 
 #define OK 0
-//const char *ssid = "PWLB24";
-//const char *password = "upqmmpmll1605";
+const char *ssid = "PWLB24";
+const char *password = "upqmmpmll1605";
 
-const char *ssid = "Olimpiadas_Teleco_2.4";
-const char *password = "olimpiadas";
+//const char *ssid = "Olimpiadas_Teleco_2.4";
+//const char *password = "olimpiadas";
 
 //const char *ssid = "MdP";
 //const char *password = "lerelereleyole";
