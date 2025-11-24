@@ -27,6 +27,7 @@ let porcentaje_fc2 = null;
 let pasos_por_vuelta = null;
 let porcentaje_por_paso = null;
 let micropasos = null;
+let max_grados = null;
 let grados = null;
 let estado_fc1 = null;
 let estado_fc2 = null;
